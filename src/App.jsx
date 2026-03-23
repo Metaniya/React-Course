@@ -7,15 +7,15 @@ function App() {
   const [tasks, setTasks] = useState([]);
 
    function addTask() {
-    if (input.trim() === "") return; 
+     if (input.trim() === "") return;
 
-     const newTask = {
-      text: input,
-      compleated: false
-     };
+  const newTask = {
+    text: input,
+    completed: false
+  };
 
-     setTasks([...tasks, newTask]);
-      setinput("");
+  setTasks([...tasks, newTask]);
+  setinput("");
   }
    
   function deleteTask(index) {
@@ -24,57 +24,70 @@ function App() {
   }
 
 
-   function editTask(index) {
-    const newTask = prompt("Edit task:", tasks[index]);
-    if (newTask !== null && newTask.trim() !== "") {
-      const newTasks = [...tasks];
-      newTasks[index] = newTask;
-      setTasks(newTasks);
-    }
-  }
-    function toggleComplete(index) {
+  function editTask(index) {
+  const newText = prompt("Edit task:", tasks[index].text);
+
+  if (!newText || newText.trim() === "") return;
+
+  const updatedTasks = [...tasks];
+  updatedTasks[index].text = newText;
+
+  setTasks(updatedTasks);
+}
+    function toggleDone (index) {
     const newTasks = [...tasks];
-    newTasks[index].compleated = !newTasks[index].compleated;
+    newTasks[index].completed = !newTasks[index].completed;
     setTasks(newTasks);
   }
   return (
-    <div>
-      <h1>Welcome to my React TodoApp!</h1>
+  <div className="app">
+    <div className="card">
+      <h1 id='wellcome title'>React Todo-App</h1>
 
-      <input type="text" 
-      placeholder="Add a new task..."  
-      value={input} 
-      onChange={(e) => 
-      setinput(e.target.value)} />
+      <div className="input-group">
+        <input
+          type="text"
+          placeholder="Add a new task..."
+          value={input}
+          onChange={(e) => setinput(e.target.value)}
+        />
+        <button onClick={addTask}>Add</button>
+      </div>
 
-      <button onClick={addTask}>Add Task</button>
+      {tasks.length === 0 ? (
+        <p className="empty">No tasks yet</p>
+      ) : (
+        <ul>
+          {tasks.map((task, index) => (
+            <li key={index} className="task">
+              <span
+                className={task.completed ? "done" : ""}
+              >
+                {task.text}
+              </span>
 
-       {tasks.length === 0 && <p>No tasks yet!</p>}
+              <div className="buttons">
+                <button onClick={() => toggleDone(index)}>
+                  {task.completed ? "Undo" : "✅"}
+                </button>
 
-      <ul>
-        {tasks.map((task, index) => (
-          <li key={index}>
-            <span style={{ textDecoration: task.compleated ? "line-through" : "none" }}>
-              {task.text}
-            </span>
-            <button onClick={() => toggleComplete(index)}>
-              {task.compleated ? "Undo" : "Complete"}
-            </button> 
+                <button onClick={() => editTask(index)}>
+                  ✏️
+                </button>
 
-
-            <button onClick={() => deleteTask(index)}>Delete</button>
-            
-            <button onClick={() => editTask(index)}>Edit</button>
-
-          </li>
-        ))}
-      </ul>
-
+                <button onClick={() => deleteTask(index)}>
+                  ❌
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
+  </div>
+);
+}
 
-  );
-
-}  
 
 
 export default App;
