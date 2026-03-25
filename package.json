@@ -8,10 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    
 },
-  "homepage": "https://Metaniya.github.io/React-Project",
   "dependencies": {
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
