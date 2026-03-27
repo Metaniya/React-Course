@@ -7,7 +7,7 @@ function TodoItem({ task, index, onToggle, onEdit, onDelete }) {
       </span>
 
       <div className="buttons">
-        {/* We pass the index back up to the parent functions */}
+        
         <button onClick={() => onToggle(index)}>
           {task.completed ? "Undo" : "✅"}
         </button>
