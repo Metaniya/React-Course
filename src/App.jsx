@@ -1,32 +1,41 @@
-// src/App.jsx
-import './App.css'
 import { useState } from 'react';
-import TodoItem from './TodoItem'; // 1. Import the new component
+import './App.css';
+import TodoItem from './components/TodoItem';
+import Modal from './components/Modal'; // Import Modal
+import { useLocalStorage } from './hooks/useLocalStorage';
+import { useToggle } from './hooks/useToggle'; // Import useToggle
 
 function App() {
   const [input, setinput] = useState("");
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useLocalStorage('my-tasks', []);
+  
+ 
+  const [isModalOpen, toggleModal] = useToggle(false);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editText, setEditText] = useState("");
 
   function addTask() {
     if (input.trim() === "") return;
-    const newTask = { text: input, completed: false };
-    setTasks([...tasks, newTask]);
+    setTasks([...tasks, { text: input, completed: false }]);
     setinput("");
   }
-   
-  function deleteTask(index) {
-    const newTasks = tasks.filter((_, i) => i !== index);
-    setTasks(newTasks);
+
+  // Modernized Edit, Open the Modal instead of using prompt()
+  function openEditModal(index) {
+    setEditingIndex(index);
+    setEditText(tasks[index].text);
+    toggleModal(); 
   }
 
-  function editTask(index) {
-    const newText = prompt("Edit task:", tasks[index].text);
-    if (!newText || newText.trim() === "") return;
+  function saveEdit() {
     const updatedTasks = [...tasks];
-    updatedTasks[index].text = newText;
+    updatedTasks[editingIndex].text = editText;
     setTasks(updatedTasks);
+    toggleModal(); 
   }
 
+ 
+  function deleteTask(index) { setTasks(tasks.filter((_, i) => i !== index)); }
   function toggleDone(index) {
     const newTasks = [...tasks];
     newTasks[index].completed = !newTasks[index].completed;
@@ -36,35 +45,35 @@ function App() {
   return (
     <div className="app">
       <div className="card">
-        <h1 id='wellcome title'>React Todo-App</h1>
-
+        <h1>React Todo-App</h1>
         <div className="input-group">
-          <input
-            type="text"
-            placeholder="Add a new task..."
-            value={input}
-            onChange={(e) => setinput(e.target.value)}
-          />
+          <input value={input} onChange={(e) => setinput(e.target.value)} placeholder="Add a task..." />
           <button onClick={addTask}>Add</button>
         </div>
 
-        {tasks.length === 0 ? (
-          <p className="empty">No tasks yet</p>
-        ) : (
-          <ul>
-            {tasks.map((task, index) => (
-              /* 2. Use the reusable component here */
-              <TodoItem 
-                key={index} 
-                task={task} 
-                index={index} 
-                onToggle={toggleDone} 
-                onEdit={editTask} 
-                onDelete={deleteTask} 
-              />
-            ))}
-          </ul>
-        )}
+        <ul>
+          {tasks.map((task, index) => (
+            <TodoItem 
+              key={index} 
+              task={task} 
+              index={index} 
+              onToggle={toggleDone} 
+              onEdit={() => openEditModal(index)} // Trigger Modal
+              onDelete={deleteTask} 
+            />
+          ))}
+        </ul>
+
+  
+        <Modal isOpen={isModalOpen} onClose={toggleModal}>
+          <h2>Edit Task</h2>
+          <input 
+            className="modal-input"
+            value={editText} 
+            onChange={(e) => setEditText(e.target.value)} 
+          />
+          <button className="save-btn" onClick={saveEdit}>Save Changes</button>
+        </Modal>
       </div>
     </div>
   );
